@@ -1,0 +1,6 @@
+1. App is primarily a visualization problem but includes the ability to persist and share views that are modified / created by the user.
+Therefore I've used a simple nodejs app combined with a mongoDB data store to allow for persisting of the users creations.
+
+2. I've included bootstrap CSS to provide tried and trusted x-browser/responsive DOM elements and components. Bootstrap is installed
+as an NPM module and I've expanded the public/served path of the node server to include the npm modules to facilitate sharing of them on the client.
+
