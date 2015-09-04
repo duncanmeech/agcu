@@ -4,8 +4,22 @@ html
     title="AGCU"
     link(rel='stylesheet', href='/bootstrap/dist/css/bootstrap.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='underscore/underscore-min.js')
+    script(src='underscore.string/dist/underscore.string.min.js')
+    block head
+
   body
     .navbar.navbar-default
       .navbar-header
         a.navbar-brand(href="#") AGCU
     block content
+    
+    script.
+
+      document.addEventListener("DOMContentLoaded", function(event) {
+        // mix underscore string into underscore
+        _.mixin(s.exports());
+        // we just assume there is an ATGC.App application waiting to exist!
+        new ATGC.App();
+      });
+      

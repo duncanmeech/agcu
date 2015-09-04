@@ -1,6 +1,35 @@
 extends layout
 
+block head
+
+  link(rel='stylesheet', href='/stylesheets/index.css')
+
+  script(src='javascripts/color.js')
+  script(src='javascripts/core.js')
+  script(src='javascripts/layout.js')
+  script(src='javascripts/dbn.js')
+  script(src='javascripts/dom_utils.js')
+  script(src='javascripts/utils.js')
+  script(src='javascripts/display.js')
+  script(src='javascripts/atgcapp.js')
+
 block content
+
   .container
     .well
-
+      //- sequence / DBN input form
+      form.form-horizontal(data-element="sequenceForm")
+        .form-group
+          label.col-sm-2.control-label(for='SEQ') Nucleotides
+          .col-sm-10
+            input#SEQ.form-control(type='text', placeholder='ATCGATCG' data-element="sequenceInput" value="ATGC") 
+        .form-group
+          label.col-sm-2.control-label(for='DBN') D.B.N.
+          .col-sm-10
+            input#DBN.form-control(type='text', placeholder='(.(..).)' data-element="dbnInput" value="....")
+        .form-group
+          .col-sm-offset-2.col-sm-10
+            button.btn.btn-primary(type='submit') Display
+            
+    .well
+      div(data-element="displaySurface")
