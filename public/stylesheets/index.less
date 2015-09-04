@@ -1,7 +1,21 @@
 @import "../../node_modules/bootstrap/less/variables.less";
 
+// display surface for graph
 .display-surface {
   width: 100%;
   min-height: 400px;
   border: 1px solid @input-border;
+  position: relative;
+}
+
+// base class for vertex elements
+.vertex {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: red;
+}
+// base class for edge elements
+.edge {
+  position: absolute;
 }

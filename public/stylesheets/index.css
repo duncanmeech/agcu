@@ -1,1 +1,1 @@
-.display-surface{width:100%;min-height:400px;border:1px solid #ccc}
+.display-surface{width:100%;min-height:400px;border:1px solid #ccc;position:relative}.vertex{position:absolute;width:10px;height:10px;background:red}.edge{position:absolute}

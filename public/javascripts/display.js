@@ -31,7 +31,29 @@ ATGC.Display.prototype.showSequence = function(dbn) {
     updateEdge: this.updateEdge.bind(this)
   });
   this.dbn.populateGraph(this.graph);
+
+  // create a layout strategy and perform initial update
+  this.layout = new ATGC.layout.GraphForceDirected(this.graph, {
+
+  });
+
+  this.layout.update(this.getDisplayBounds(), ATGC.Display.kGRAPH_UPDATE_TIME)
 };
+
+/**
+ * get the current display bounds
+ * @return {[type]} [description]
+ */
+ATGC.Display.prototype.getDisplayBounds = function () {
+
+    return new ATGC.layout.Box(0,0, this.el.clientWidth, this.el.clientHeight);
+};
+
+/**
+ * ms per update cycle of the force directed graph
+ * @type {Number}
+ */
+ATGC.Display.kGRAPH_UPDATE_TIME = 10;
 
 /**
  * callback from graph when we should create a vertex element
@@ -39,14 +61,22 @@ ATGC.Display.prototype.showSequence = function(dbn) {
  */
 ATGC.Display.prototype.createVertex = function(vertex) {
   console.log('create vertex');
+  var d = document.createElement('div');
+  d.classList.add('vertex');
+  this.el.appendChild(d);
+  return d;
 };
 
 /**
  * callback from graph when we should create an edge element
  * @param  {ATGC.core.GraphEdge} edge
  */
-ATGC.Display.prototype.createEdge = function(vertex) {
+ATGC.Display.prototype.createEdge = function(edge) {
   console.log('create edge');
+  var d = document.createElement('div');
+  d.classList.add('edge');
+  this.el.appendChild(d);
+  return d;
 };
 
 /**
@@ -56,7 +86,8 @@ ATGC.Display.prototype.createEdge = function(vertex) {
  * @param {G.Vector2D} vector - point/vector of vertex position
  */
 ATGC.Display.prototype.updateVertex = function(vertex, element, vector) {
-  console.log('update vertex');
+  element.style.left = vector.x + 'px';
+  element.style.top = vector.y + 'px';
 };
 
 /**

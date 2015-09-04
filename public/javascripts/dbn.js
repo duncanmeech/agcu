@@ -96,9 +96,10 @@ ATGC.DBN.prototype.validate = function () {
 
     // if closing parenthesis then verify there is a matching item on the stack
     if (this.dbn[i] === ')') {
-      if (this.stack.length === 0) {
+      if (stack.length === 0) {
         return _.sprintf('Bracket mismatch in DBN at position %s', i);
       }
+      stack.pop();
     }
 
     i += 1;
@@ -116,7 +117,7 @@ ATGC.DBN.prototype.validate = function () {
  * valid characters for sequence and DBN
  * @const {string}
  */
-ATGC.DBN.SCHARS = 'AGCT';
+ATGC.DBN.SCHARS = 'AGCTUI';
 ATGC.DBN.DCHARS = '.()';
 
 
@@ -127,3 +128,9 @@ ATGC.DBN.DCHARS = '.()';
  */
 ATGC.DBN.BACKBONE = 'Backbone';
 ATGC.DBN.NUCLEOTIDE = 'Nucleotide';
+
+/*
+  e.g.
+  CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA
+  ..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..
+ */
