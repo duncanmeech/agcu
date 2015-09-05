@@ -8,9 +8,10 @@ var ATGC = ATGC || {};
  */
 ATGC.DBN = function (sequence, dbn) {
 
-  // sequence should be upper case
-  this.sequence = sequence ? sequence.toUpperCase() : sequence;
-  this.dbn = dbn;
+  // sequence should be upper case with no white space at either end
+  this.sequence = sequence ? _.trim(sequence.toUpperCase()) : sequence;
+  // dbn should not have white space either
+  this.dbn = dbn ? _.trim(dbn) : dbn;
 
 };
 
@@ -30,8 +31,8 @@ ATGC.DBN.prototype.populateGraph = function (g) {
 
     var v = g.addVertex({
       index: i,
-      schar: this.sequence[i],
-      dchar: this.dbn[i]
+      nucleotide: this.sequence[i],
+      dbn: this.dbn[i]
     });
 
     // there is always a directed edge from the previous vertex
@@ -68,7 +69,7 @@ ATGC.DBN.prototype.validate = function () {
 
   // 1. sequences should not be empty.
   if (!this.sequence || !this.dbn) {
-    return 'Empty sequence';
+    return 'Empty sequence or DBN';
   }
 
   // 2. sequences should match in length

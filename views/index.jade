@@ -12,6 +12,9 @@ block head
   script(src='javascripts/utils.js')
   script(src='javascripts/display.js')
   script(src='javascripts/layout.js')
+  script(src='javascripts/element.js')
+  script(src='node-uuid/uuid.js')
+  script(src='javascripts/events.js')
   script(src='javascripts/atgcapp.js')
 
 block content
@@ -23,11 +26,11 @@ block content
         .form-group
           label.col-sm-2.control-label(for='SEQ') Nucleotides
           .col-sm-10
-            input#SEQ.form-control(type='text', placeholder='ATCGATCG' data-element="sequenceInput" value="CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA") 
+            input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput" value="CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA") 
         .form-group
           label.col-sm-2.control-label(for='DBN') D.B.N.
           .col-sm-10
-            input#DBN.form-control(type='text', placeholder='(.(..).)' data-element="dbnInput" value="..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..")
+            input#DBN.form-control(type='text', placeholder='(..)' data-element="dbnInput" value="..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..")
         .form-group
           .col-sm-offset-2.col-sm-10
             button.btn.btn-primary(type='submit') Display

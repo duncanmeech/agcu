@@ -55,7 +55,7 @@ D.stringToSVG = function(s) {
 /**
  * return the dimensions of an SVG using the width/height attribute or the viewBox
  * @param  {SVGElement} svge
- * @return {G.Vector2D}
+ * @return {ATGC.layout.Vector}
  */
 D.svgSize = function(svge) {
 
@@ -84,7 +84,7 @@ D.svgSize = function(svge) {
     }
   }
 
-  return new G.Vector2D(width, height);
+  return new ATGC.layout.Vector(width, height);
 };
 
 var units = {};
@@ -172,7 +172,7 @@ D.importElements = function(element, target) {
 D.scrollOffset = function(element) {
 
   U.ASSERT(element, "Bad parameter");
-  return new G.Vector2D(element.scrollLeft, element.scrollTop);
+  return new ATGC.layout.Vector(element.scrollLeft, element.scrollTop);
 };
 
 /**
@@ -224,35 +224,35 @@ D.mouseToLocal = function(e, element) {
     pageY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
   }
 
-  return D.globalToLocal(new G.Vector2D(pageX, pageY), element);
+  return D.globalToLocal(new ATGC.layout.Vector(pageX, pageY), element);
 };
 
 /**
  * convert page coordinates into local coordinates
  * @param v
  * @param element
- * @returns {G.Vector2D}
+ * @returns {ATGC.layout.Vector}
  */
 D.globalToLocal = function(v, element) {
 
   U.ASSERT(v && element, 'Bad parameters');
   var p = D.documentOffset(element);
-  return new G.Vector2D(v.x - p.left, v.y - p.top);
+  return new ATGC.layout.Vector(v.x - p.left, v.y - p.top);
 
 };
 
 /**
  * reverse/opposite of mouseToLocal/globalToLocal, converts a x/y point in client area coordinates
  * to document coordinates ( page )
- * @param {G.Vector2D} v
+ * @param {ATGC.layout.Vector} v
  * @param {HTMLElement} element
- * @returns {G.Vector2D}
+ * @returns {ATGC.layout.Vector}
  */
 D.localToGlobal = function(v, element) {
 
   U.ASSERT(v && element, 'Bad parameters');
   var p = D.documentOffset(element);
-  return new G.Vector2D(v.x + p.left, v.y + p.top);
+  return new ATGC.layout.Vector(v.x + p.left, v.y + p.top);
 };
 
 /**
