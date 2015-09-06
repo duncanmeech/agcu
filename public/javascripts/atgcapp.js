@@ -104,11 +104,19 @@ ATGC.App.prototype.mouseMove = function(event, p, v) {
   }
 
   // if we were given a vertex highlight in the DBN sequence inputs
-  if (v) {
-    this.sequenceInput.setSelectionRange(v.index, 1);
-    this.dbnInput.setSelectionRange(v.index, 1);
+  if (v && this.dbn) {
+
+    // highlight with an asterix
+    var s = this.dbn.sequence;
+    s = s.substr(0, v.index) + '*' + s.substr(v.index);
+    this.sequenceInput.innerHTML = s;
+
+    s = this.dbn.dbn;
+    s = s.substr(0, v.index) + '*' + s.substr(v.index);
+    this.dbnInput.innerHTML = s;
   }
 };
+
 
 /**
  * mouse move handler
@@ -182,8 +190,8 @@ ATGC.App.prototype.enterState = function(state) {
 
       } else {
         // set default sequence
-        this.sequenceInput.value = 'CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA';
-        this.dbnInput.value = '..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..';
+        this.sequenceInput.innerHTML = 'CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA';
+        this.dbnInput.innerHTML = '..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..';
         this.enterState(ATGC.App.UI_FSM.NewSequence);
 
       }
@@ -194,8 +202,8 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.CreateNew:
 
       this.documentID = null;
-      this.sequenceInput.value = '';
-      this.dbnInput.value = '';
+      this.sequenceInput.innerHTML = '';
+      this.dbnInput.innerHTML = '';
       this.updateShareURL();
       this.graph.reset();
 
@@ -212,8 +220,8 @@ ATGC.App.prototype.enterState = function(state) {
 
         if (error === K.API_NO_ERROR) {
           // display the sequence including validation
-          this.sequenceInput.value = sequence;
-          this.dbnInput.value = dbn;
+          this.sequenceInput.innerHTML = sequence;
+          this.dbnInput.innerHTML = dbn;
           this.enterState(ATGC.App.UI_FSM.NewSequence);
 
         } else {
@@ -236,7 +244,7 @@ ATGC.App.prototype.enterState = function(state) {
         X.Save(this.documentID, this.dbn.sequence, this.dbn.dbn, function(error) {
 
           if (error === K.API_NO_ERROR) {
-            this.showSuccess('Your sequence was successfully saved.')
+            this.showSuccess('Your sequence was successfully saved.');
           } else {
             this.showError(K.errorToString(error));
           }
@@ -270,7 +278,7 @@ ATGC.App.prototype.enterState = function(state) {
       // validate and display new sequence
     case ATGC.App.UI_FSM.NewSequence:
 
-      var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
+      var dbn = new ATGC.DBN(this.sequenceInput.innerText, this.dbnInput.innerText);
       var error = dbn.validate();
       this.enterState(error ? ATGC.App.UI_FSM.SequenceError : ATGC.App.UI_FSM.DisplaySequence);
 
@@ -279,7 +287,7 @@ ATGC.App.prototype.enterState = function(state) {
       // current sequence has an error, display it
     case ATGC.App.UI_FSM.SequenceError:
 
-      var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
+      var dbn = new ATGC.DBN(this.sequenceInput.innerText, this.dbnInput.innerText);
       this.showError(dbn.validate());
 
       break;
@@ -288,7 +296,7 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.DisplaySequence:
 
       // sequence appears valid, display it
-      this.dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
+      this.dbn = new ATGC.DBN(this.sequenceInput.innerText, this.dbnInput.innerText);
       this.graph.showSequence(this.dbn);
 
       // start a timer to improve the layout until we exit this state

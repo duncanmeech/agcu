@@ -33,15 +33,13 @@ block content
       
     form.form-horizontal.sequence-form(data-element="sequenceForm")
       .form-group
-        div.form-control(contenteditable="true")
-      .form-group
-        label.col-sm-2.control-label(for='SEQ') Nucleotides
+        label.col-sm-2.control-label Nucleotides
         .col-sm-10
-          input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput")
+          div#SEQ.form-control.editbox(data-element="sequenceInput" contenteditable="true")
       .form-group
         label.col-sm-2.control-label(for='DBN') D.B.N.
         .col-sm-10
-          input#DBN.form-control(type='text', placeholder='(..)' data-element="dbnInput")
+          div#DBN.form-control.editbox(contenteditable="true" data-element="dbnInput")
       .form-group
         label.col-sm-2.control-label(for='URL') Share URL
         .col-sm-10

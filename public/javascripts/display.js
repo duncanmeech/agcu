@@ -14,6 +14,38 @@ ATGC.Display = function(el) {
   this.el.addEventListener('mousedown', this.mouseDown.bind(this));
   this.el.addEventListener('mousemove', this.mouseMove.bind(this));
   this.el.addEventListener('mouseup', this.mouseUp.bind(this));
+  this.el.addEventListener('mouseenter', this.mouseEnter.bind(this));
+  this.el.addEventListener('mouseleave', this.mouseLeave.bind(this));
+};
+
+/**
+ * mouse move handler
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+ATGC.Display.prototype.mouseEnter = function(e) {
+  console.log("Enter");
+};
+ATGC.Display.prototype.mouseLeave = function(e) {
+  console.log("Leave");
+};
+
+
+/**
+ * mouse move handler
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+ATGC.Display.prototype.mouseDown = function(e) {
+
+  // transform point
+  var p = D.mouseToLocal(e, this.el);
+  var v = this.findVertex(p);
+
+  // signal that the user has grabbed a vertex
+  if (v) {
+    Events.I().publish(Events.VERTEX_PICKED, v);
+  }
 };
 
 /**
