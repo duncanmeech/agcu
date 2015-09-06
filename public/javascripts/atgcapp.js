@@ -36,7 +36,10 @@ ATGC.App.prototype.UISetup = function() {
   this.displayButton.addEventListener('click', this.onNewSequence.bind(this));
 
   // share button handler
-  this.shareButton.addEventListener('click', this.onShare.bind(this));
+  this.shareButton.addEventListener('click', this.onSave.bind(this));
+
+  // new button handler
+  this.newButton.addEventListener('click', this.onNew.bind(this));
 
   // initialize graph display surface
   this.graph = new ATGC.Display(this.displaySurface);
@@ -49,9 +52,19 @@ ATGC.App.prototype.UISetup = function() {
  * share the sequence if not already shared
  * @return {[type]} [description]
  */
-ATGC.App.prototype.onShare = function() {
+ATGC.App.prototype.onSave = function() {
 
   this.enterState(ATGC.App.UI_FSM.ShareSave);
+
+};
+
+/**
+ * share the sequence if not already shared
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.onNew = function() {
+
+  this.enterState(ATGC.App.UI_FSM.CreateNew);
 
 };
 
@@ -172,6 +185,19 @@ ATGC.App.prototype.enterState = function(state) {
 
       break;
 
+      // create a new sequence
+    case ATGC.App.UI_FSM.CreateNew:
+
+      this.documentID = null;
+      this.sequenceInput.value = '';
+      this.dbnInput.value = '';
+      this.updateShareURL();
+      this.graph.reset();
+
+      this.showSuccess('Enter your new sequence into Nucleotides and DBN inputs below, then click Display');
+
+      break;
+
       // load a sequence from this.documentID
     case ATGC.App.UI_FSM.LoadSequence:
 
@@ -221,6 +247,7 @@ ATGC.App.prototype.enterState = function(state) {
         X.Create(this.dbn, function(error, id) {
 
           if (error === K.API_NO_ERROR) {
+            this.showSuccess('Your sequence was successfully saved.');
             this.documentID = id;
             this.updateShareURL();
           } else {
@@ -408,6 +435,9 @@ ATGC.App.UI_FSM = {
   LoadSequence: 'LoadSequence',
 
   // share the sequence
-  ShareSequence: 'ShareSequence'
+  ShareSequence: 'ShareSequence',
+
+  // create a new sequence
+  CreateNew: 'CreateNew'
 
 };

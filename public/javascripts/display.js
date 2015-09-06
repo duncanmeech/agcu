@@ -108,6 +108,17 @@ ATGC.Display.prototype.moveVertex = function(vertex, p) {
 };
 
 /**
+ * clear the current display
+ */
+ATGC.Display.prototype.reset = function () {
+
+  // clear the current graph and DBN
+  D.empty(this.el);
+  this.dbn = null;
+  this.layout = null;
+};
+
+/**
  * show the given sequence, which we assume is valid
  * @param  {ATGC.DBN} dbn
  */

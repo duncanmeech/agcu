@@ -42,9 +42,4 @@ mongoose.connect(config.mongourl, {
 
 }));
 
-//// kick off the app server
-//app.listen(port, function () {
-//
-//});
-
 module.exports = app;
