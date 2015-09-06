@@ -100,3 +100,9 @@ Events.prototype.publish = function(event) {
 
 // user grabbed a vertex to move
 Events.VERTEX_PICKED = 'vertex-picked';
+
+// generic mouse move on the display surface
+Events.MOUSE_MOVE = 'mouse-move';
+
+// generic mouse up on the display surface
+Events.MOUSE_UP = 'mouse-up';

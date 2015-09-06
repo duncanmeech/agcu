@@ -25,6 +25,10 @@ ATGC.App.prototype.UISetup = function() {
   // sink events on the global bus
   Events.I().subscribe(Events.VERTEX_PICKED, this.vertexPicked.bind(this));
 
+  // mouse events, only handled within the context of a vertex drag
+  Events.I().subscribe(Events.MOUSE_MOVE, this.mouseMove.bind(this));
+  Events.I().subscribe(Events.MOUSE_UP, this.mouseUp.bind(this));
+
   // initialize graph display surface
   this.graph = new ATGC.Display(this.displaySurface);
 
@@ -36,14 +40,53 @@ ATGC.App.prototype.UISetup = function() {
  * when the user starts a drag on a vertex
  * @return {[type]} [description]
  */
-ATGC.App.prototype.vertexPicked = function () {
+ATGC.App.prototype.vertexPicked = function (event, vertex) {
 
   // if we are evolving the graph, then exit that state and switch to
   // user input mode
   if (this.state === ATGC.App.UI_FSM.DisplaySequence) {
     this.enterState(ATGC.App.UI_FSM.EditGraph);
   }
-}
+
+  // if we are in edit mode then start a drag
+  if (this.state === ATGC.App.UI_FSM.EditGraph) {
+    this.dragVertex = vertex;
+    this.enterState(ATGC.App.UI_FSM.DragVertex);
+  }
+};
+
+/**
+ * mouse move handler
+ * @param  {[type]} event [description]
+ * @param  {[type]} p     [description]
+ * @return {[type]}       [description]
+ */
+ATGC.App.prototype.mouseMove = function(event, p) {
+
+  // ignore unless we are dragging a vertex
+  if (this.state === ATGC.App.UI_FSM.DragVertex) {
+    // move the vertex element to given position
+    this.dragVertex.element.updatePosition(p);
+  }
+};
+
+/**
+ * mouse move handler
+ * @param  {[type]} event [description]
+ * @param  {[type]} p     [description]
+ * @return {[type]}       [description]
+ */
+ATGC.App.prototype.mouseUp = function(event, p) {
+
+  // ignore unless we are dragging a vertex
+  if (this.state === ATGC.App.UI_FSM.DragVertex) {
+    console.log('end drag vertex');
+    // back to edit mode
+    this.enterState(ATGC.App.UI_FSM.EditGraph);
+  }
+};
+
+
 
 /**
  * enter a new UI state
@@ -91,6 +134,13 @@ ATGC.App.prototype.enterState = function(state) {
 
       // user is manipulating the graph
     case ATGC.App.UI_FSM.EditGraph:
+
+      break;
+
+      // user is dragging a vertex
+    case ATGC.App.UI_FSM.DragVertex:
+
+      U.ASSERT(this.dragVertex, 'Expecting a vertex to be assigned to this.vertex');
 
       break;
   }
@@ -161,6 +211,10 @@ ATGC.App.UI_FSM = {
   // display a valid sequence
   DisplaySequence: 'DisplaySequence',
 
-  // user is editing the graph
-  EditGraph: 'EditGraph'
+  // user is editing the graph, but not actually doing anything at this time
+  EditGraph: 'EditGraph',
+
+  // user is dragging a vertex, this.dragVertex is the vertex
+  DragVertex: 'DragVertex'
+
 };

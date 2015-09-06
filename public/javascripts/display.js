@@ -23,9 +23,14 @@ ATGC.Display = function(el) {
  */
 ATGC.Display.prototype.mouseDown = function(e) {
 
+  // transform point
   var p = D.mouseToLocal(e, this.el);
-  console.log("Mouse Down:" + p.x + "," + p.y);
-  Events.I().publish(Events.VERTEX_PICKED);
+  var v = this.findVertex(p);
+
+  // signal that the user has grabbed a vertex
+  if (v) {
+    Events.I().publish(Events.VERTEX_PICKED, v);
+  }
 };
 
 /**
@@ -36,7 +41,8 @@ ATGC.Display.prototype.mouseDown = function(e) {
 ATGC.Display.prototype.mouseMove = function(e) {
 
   var p = D.mouseToLocal(e, this.el);
-  console.log("Mouse Move:" + p.x + "," + p.y);
+  Events.I().publish(Events.MOUSE_MOVE, p);
+
 };
 
 /**
@@ -47,7 +53,35 @@ ATGC.Display.prototype.mouseMove = function(e) {
 ATGC.Display.prototype.mouseUp = function(e) {
 
   var p = D.mouseToLocal(e, this.el);
-  console.log("Mouse Up:" + p.x + "," + p.y);
+  Events.I().publish(Events.MOUSE_UP, p);
+
+};
+
+/**
+ * return the vertex at the given display coordinates
+ * @param  {[type]} p [description]
+ * @return {[type]}   [description]
+ */
+ATGC.Display.prototype.findVertex = function(sp) {
+
+  var hit = null;
+  this.layout.eachVertex(function(v) {
+
+    // get location of vertex element
+    var vx = parseFloat(v.element.el.style.left);
+    var vy = parseFloat(v.element.el.style.top);
+
+    // get distance to point location
+    var d = new ATGC.layout.Line(sp.x, sp.y, vx, vy).length;
+
+    // if distance is within radius of vertex then its a hit
+    if (d < ATGC.kNR / 2) {
+      hit = v;
+    }
+
+  }.bind(this));
+
+  return hit;
 };
 
 /**
@@ -82,7 +116,7 @@ ATGC.Display.prototype.showSequence = function(dbn) {
 /**
  * improve and update the current layout, unless the graph has stabalized
  */
-ATGC.Display.prototype.continueLayout = function () {
+ATGC.Display.prototype.continueLayout = function() {
 
   if (this.layout && this.layout.totalEnergy() > 0.01) {
     this.layout.update(this.getDisplayBounds(), ATGC.Display.kGRAPH_UPDATE_TIME);
