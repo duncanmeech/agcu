@@ -91,17 +91,22 @@ ATGC.App.prototype.vertexPicked = function(event, vertex) {
 /**
  * mouse move handler
  * @param  {[type]} event [description]
- * @param  {[type]} p     [description]
- * @return {[type]}       [description]
+ * @param  {Vector2D} p - display client point
+ * @return {Graph Vertex} - optional
  */
-ATGC.App.prototype.mouseMove = function(event, p) {
+ATGC.App.prototype.mouseMove = function(event, p, v) {
 
   // ignore unless we are dragging a vertex
   if (this.state === ATGC.App.UI_FSM.DragVertex) {
 
     // move the vertex element to given position and bring in/out edges with it
     this.graph.moveVertex(this.dragVertex, p);
+  }
 
+  // if we were given a vertex highlight in the DBN sequence inputs
+  if (v) {
+    this.sequenceInput.setSelectionRange(v.index, 1);
+    this.dbnInput.setSelectionRange(v.index, 1);
   }
 };
 

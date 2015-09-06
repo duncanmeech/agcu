@@ -41,7 +41,8 @@ ATGC.Display.prototype.mouseDown = function(e) {
 ATGC.Display.prototype.mouseMove = function(e) {
 
   var p = D.mouseToLocal(e, this.el);
-  Events.I().publish(Events.MOUSE_MOVE, p);
+  var v = this.findVertex(p);
+  Events.I().publish(Events.MOUSE_MOVE, p, v);
 
 };
 

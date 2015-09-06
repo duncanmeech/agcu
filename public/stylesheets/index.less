@@ -3,6 +3,7 @@
 // z-indices for display elements
 @vertex-z: 100;
 @edge-z: 50;
+@top-z: 200;
 
 
 // min height of display area
@@ -28,7 +29,6 @@
 // base class for all absolutely positioned elements
 .displayElement {
   position: absolute;
-  transform-origin: 50% 50%;
 }
 
 // base class for vertex elements
@@ -40,6 +40,13 @@
   z-index: @vertex-z;
   border: 2px solid lightgray;
   box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.97);
+  cursor: pointer;
+  transition: transform 100ms ease;
+}
+.nucleotide:hover {
+  transform: scale(1.5, 1.5) translateX(-25%) translateY(-25%);
+  z-index: @top-z;
+  border: 2px solid white;
 }
 // centered text on nucleotide
 .nucleotide-text {

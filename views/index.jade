@@ -33,6 +33,8 @@ block content
       
     form.form-horizontal.sequence-form(data-element="sequenceForm")
       .form-group
+        div.form-control(contenteditable="true")
+      .form-group
         label.col-sm-2.control-label(for='SEQ') Nucleotides
         .col-sm-10
           input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput")
