@@ -106,3 +106,6 @@ Events.MOUSE_MOVE = 'mouse-move';
 
 // generic mouse up on the display surface
 Events.MOUSE_UP = 'mouse-up';
+
+// start displaying a new sequence
+Events.NEW_SEQUENCE = 'new-sequence';

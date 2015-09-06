@@ -4,6 +4,7 @@ block head
 
   link(rel='stylesheet', href='/stylesheets/index.css')
 
+  script(src='node-uuid/uuid.js')
   script(src='javascripts/color.js')
   script(src='javascripts/core.js')
   script(src='javascripts/layout.js')
@@ -13,28 +14,40 @@ block head
   script(src='javascripts/display.js')
   script(src='javascripts/layout.js')
   script(src='javascripts/element.js')
-  script(src='node-uuid/uuid.js')
   script(src='javascripts/events.js')
+  script(src='javascripts/xhr.js')
+  script(src='javascripts/consts.js')
   script(src='javascripts/atgcapp.js')
 
 block content
 
   .container
-    //- .well
-      //- sequence / DBN input form
-    form.form-horizontal(data-element="sequenceForm")
+  
+    .alert.alert-danger.hidden(role="alert" data-element="alertError")
+      b Error&nbsp;
+      span(data-element="errorMessage")
+    
+    .alert.alert-success.hidden(role="alert" data-element="alertSuccess")
+      b Success&nbsp;
+      span(data-element="successMessage")
+      
+    form.form-horizontal.sequence-form(data-element="sequenceForm")
       .form-group
         label.col-sm-2.control-label(for='SEQ') Nucleotides
         .col-sm-10
-          input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput" value="CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA") 
+          input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput")
       .form-group
         label.col-sm-2.control-label(for='DBN') D.B.N.
         .col-sm-10
-          input#DBN.form-control(type='text', placeholder='(..)' data-element="dbnInput" value="..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..")
+          input#DBN.form-control(type='text', placeholder='(..)' data-element="dbnInput")
       .form-group
-        .col-sm-offset-2.col-sm-10
-          button.btn.btn-primary(type='submit') Display
-          span.error-span.hidden(data-element="errorSpan")
-            
-    //- .well
+        label.col-sm-2.control-label(for='URL') Share URL
+        .col-sm-10
+          input#URL.form-control(type='text', placeholder='URL available after saving' data-element="shareURL")
+      button.hidden(type="submit")
+      
+    div.toolbar
+      button.btn.btn-success(data-element="displayButton") Display
+      button.btn.btn-default(data-element="shareButton") Save
+  
     div(data-element="displaySurface")

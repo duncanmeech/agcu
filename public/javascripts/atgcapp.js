@@ -29,18 +29,38 @@ ATGC.App.prototype.UISetup = function() {
   Events.I().subscribe(Events.MOUSE_MOVE, this.mouseMove.bind(this));
   Events.I().subscribe(Events.MOUSE_UP, this.mouseUp.bind(this));
 
+  // new sequence event
+  Events.I().subscribe(Events.NEW_SEQUENCE, this.onNewSequence.bind(this));
+
+  // new sequence can be triggered from the toolbar also
+  this.displayButton.addEventListener('click', this.onNewSequence.bind(this));
+
+  // share button handler
+  this.shareButton.addEventListener('click', this.onShare.bind(this));
+
   // initialize graph display surface
   this.graph = new ATGC.Display(this.displaySurface);
 
   // set initial UI state
-  this.enterState(ATGC.App.UI_FSM.NewSequence);
+  this.enterState(ATGC.App.UI_FSM.Initialize);
 };
+
+/**
+ * share the sequence if not already shared
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.onShare = function() {
+
+  this.enterState(ATGC.App.UI_FSM.ShareSave);
+
+};
+
 
 /**
  * when the user starts a drag on a vertex
  * @return {[type]} [description]
  */
-ATGC.App.prototype.vertexPicked = function (event, vertex) {
+ATGC.App.prototype.vertexPicked = function(event, vertex) {
 
   // if we are evolving the graph, then exit that state and switch to
   // user input mode
@@ -87,6 +107,35 @@ ATGC.App.prototype.mouseUp = function(event, p) {
   }
 };
 
+/**
+ * the new sequence event was triggered
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.onNewSequence = function() {
+  this.enterState(ATGC.App.UI_FSM.NewSequence);
+};
+
+/**
+ * parse query string parameters into object
+ * @return {Object} parameter hash
+ */
+ATGC.App.prototype.getQueryStrings = function() {
+
+  var assoc = {};
+  var decode = function(s) {
+    return decodeURIComponent(s.replace(/\+/g, " "));
+  };
+  var queryString = location.search.substring(1);
+  var keyValues = queryString.split('&');
+
+  for (var i in keyValues) {
+    var key = keyValues[i].split('=');
+    if (key.length > 1) {
+      assoc[decode(key[0])] = decode(key[1]);
+    }
+  }
+  return assoc;
+};
 
 
 /**
@@ -104,7 +153,89 @@ ATGC.App.prototype.enterState = function(state) {
 
   switch (this.state) {
 
-    // validate and display new sequence
+    // initialize with default graph or load one from the server
+    case ATGC.App.UI_FSM.Initialize:
+
+      var id = this.getQueryStrings().sequence;
+      if (id) {
+
+        this.documentID = id;
+        this.enterState(ATGC.App.UI_FSM.LoadSequence);
+
+      } else {
+        // set default sequence
+        this.sequenceInput.value = 'CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA';
+        this.dbnInput.value = '..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..';
+        this.enterState(ATGC.App.UI_FSM.NewSequence);
+
+      }
+
+      break;
+
+      // load a sequence from this.documentID
+    case ATGC.App.UI_FSM.LoadSequence:
+
+      this.updateShareURL();
+
+      X.Load(this.documentID, function(error, sequence, dbn) {
+
+        if (error === K.API_NO_ERROR) {
+          // display the sequence including validation
+          this.sequenceInput.value = sequence;
+          this.dbnInput.value = dbn;
+          this.enterState(ATGC.App.UI_FSM.NewSequence);
+
+        } else {
+          this.showError(K.errorToString(error));
+
+          // switch to edit mode
+          this.enterState(ATGC.App.UI_FSM.EditGraph);
+        }
+
+      }.bind(this));
+
+      break;
+
+      // share the sequence, or simply display the URI we are already shared by
+    case ATGC.App.UI_FSM.ShareSave:
+
+      if (this.documentID) {
+
+        // save existing document
+        X.Save(this.documentID, this.dbn.sequence, this.dbn.dbn, function(error) {
+
+          if (error === K.API_NO_ERROR) {
+            this.showSuccess('Your sequence was successfully saved.')
+          } else {
+            this.showError(K.errorToString(error));
+          }
+
+          // back to edit mode
+          this.enterState(ATGC.App.UI_FSM.EditGraph);
+
+        }.bind(this));
+
+      } else {
+
+        // create a new document
+        X.Create(this.dbn, function(error, id) {
+
+          if (error === K.API_NO_ERROR) {
+            this.documentID = id;
+            this.updateShareURL();
+          } else {
+            this.showError(K.errorToString(error));
+          }
+
+          // back to edit mode
+          this.enterState(ATGC.App.UI_FSM.EditGraph);
+
+        }.bind(this));
+      }
+
+      break;
+
+      // validate and display new sequence
     case ATGC.App.UI_FSM.NewSequence:
 
       var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
@@ -117,8 +248,7 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.SequenceError:
 
       var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
-      this.errorSpan.innerText = dbn.validate();
-      this.errorSpan.classList.remove('hidden');
+      this.showError(dbn.validate());
 
       break;
 
@@ -126,14 +256,14 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.DisplaySequence:
 
       // sequence appears valid, display it
-      var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
-      this.graph.showSequence(dbn);
+      this.dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
+      this.graph.showSequence(this.dbn);
 
       // start a timer to improve the layout until we exit this state
       this.displayTimer = setInterval(this.evolveGraph.bind(this), ATGC.Display.kGRAPH_UPDATE_TIME * 2);
 
       // hide any previous errors
-      this.errorSpan.classList.add('hidden');
+      this.hideAlerts();
 
       break;
 
@@ -152,6 +282,23 @@ ATGC.App.prototype.enterState = function(state) {
 };
 
 /**
+ * update share URL if we have a document id
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.updateShareURL = function() {
+
+  if (this.documentID) {
+    var url = _.sprintf('%s//%s/?sequence=%s',
+      window.location.protocol,
+      window.location.host,
+      this.documentID);
+    this.shareURL.value = url;
+  } else {
+    this.shareURL.value = '';
+  }
+};
+
+/**
  * exit the current UI state
  * @return {[type]} [description]
  */
@@ -166,7 +313,7 @@ ATGC.App.prototype.exitState = function() {
       clearInterval(this.displayTimer);
       this.displayTimer = null;
 
-    break;
+      break;
   }
 
   this.state = ATGC.App.UI_FSM.None;
@@ -176,7 +323,7 @@ ATGC.App.prototype.exitState = function() {
  * update the graph display
  * @return {[type]} [description]
  */
-ATGC.App.prototype.evolveGraph = function () {
+ATGC.App.prototype.evolveGraph = function() {
 
   U.ASSERT(this.graph, 'Expected a graph');
   this.graph.continueLayout();
@@ -191,10 +338,42 @@ ATGC.App.prototype.evolveGraph = function () {
 ATGC.App.prototype.submitSequence = function(e) {
 
   // start new sequence and prevent form submission
+  Events.I().publish(Events.NEW_SEQUENCE);
 
-  this.enterState(ATGC.App.UI_FSM.NewSequence);
+  // prevent form submission
   e.preventDefault();
   return true;
+};
+
+/**
+ * hide all alerts
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.hideAlerts = function() {
+  this.alertSuccess.classList.add('hidden');
+  this.alertError.classList.add('hidden');
+};
+
+/**
+ * use modeless alert to show the error message
+ */
+ATGC.App.prototype.showError = function(msg) {
+
+  // show error alert
+  this.alertError.classList.remove('hidden');
+  this.errorMessage.innerText = msg;
+  this.alertSuccess.classList.add('hidden');
+};
+
+/**
+ * use modeless alert to show the success message
+ */
+ATGC.App.prototype.showSuccess = function(msg) {
+
+  // show success alert
+  this.alertSuccess.classList.remove('hidden');
+  this.alertSuccess.innerText = msg;
+  this.alertError.classList.add('hidden');
 };
 
 
@@ -206,6 +385,9 @@ ATGC.App.UI_FSM = {
 
   // no state
   None: 'None',
+
+  // initialize by loading a graph or showing the default one
+  Initialize: 'Initialize',
 
   // validate and display a new sequence
   NewSequence: 'NewSequence',
@@ -220,6 +402,12 @@ ATGC.App.UI_FSM = {
   EditGraph: 'EditGraph',
 
   // user is dragging a vertex, this.dragVertex is the vertex
-  DragVertex: 'DragVertex'
+  DragVertex: 'DragVertex',
+
+  // load a sequence
+  LoadSequence: 'LoadSequence',
+
+  // share the sequence
+  ShareSequence: 'ShareSequence'
 
 };
