@@ -20,20 +20,21 @@ block head
 block content
 
   .container
-    .well
+    //- .well
       //- sequence / DBN input form
-      form.form-horizontal(data-element="sequenceForm")
-        .form-group
-          label.col-sm-2.control-label(for='SEQ') Nucleotides
-          .col-sm-10
-            input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput" value="CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA") 
-        .form-group
-          label.col-sm-2.control-label(for='DBN') D.B.N.
-          .col-sm-10
-            input#DBN.form-control(type='text', placeholder='(..)' data-element="dbnInput" value="..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..")
-        .form-group
-          .col-sm-offset-2.col-sm-10
-            button.btn.btn-primary(type='submit') Display
+    form.form-horizontal(data-element="sequenceForm")
+      .form-group
+        label.col-sm-2.control-label(for='SEQ') Nucleotides
+        .col-sm-10
+          input#SEQ.form-control(type='text', placeholder='ATCG' data-element="sequenceInput" value="CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA") 
+      .form-group
+        label.col-sm-2.control-label(for='DBN') D.B.N.
+        .col-sm-10
+          input#DBN.form-control(type='text', placeholder='(..)' data-element="dbnInput" value="..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..")
+      .form-group
+        .col-sm-offset-2.col-sm-10
+          button.btn.btn-primary(type='submit') Display
+          span.error-span.hidden(data-element="errorSpan")
             
-    .well
-      div(data-element="displaySurface")
+    //- .well
+    div(data-element="displaySurface")

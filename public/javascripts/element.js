@@ -83,6 +83,10 @@ ATGC.Edge = function(graphedge) {
  */
 ATGC.Edge.prototype.updatePosition = function(p1, p2) {
 
+  // record end points of line
+  this.start = p1;
+  this.end = p2;
+
   // now calculate the length of the line which becomes the width of the div
   var len = Math.sqrt(((p2.x - p1.x) * (p2.x - p1.x)) + ((p2.y - p1.y) * (p2.y - p1.y)));
 

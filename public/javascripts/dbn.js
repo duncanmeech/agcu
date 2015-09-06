@@ -134,4 +134,9 @@ ATGC.DBN.NUCLEOTIDE = 'Nucleotide';
   e.g.
   CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA
   ..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..
+
+  or
+  AAGAAGAGGTAGCGAGTGGACGTGACTGCTCTATCCCGGGCAAAAGGGATAGAACCAGAGGTGGGGAGTCTGGGCAGTCGGCGACCCGCGAAGACTTGAGGTGCCGCAGCGGCATCCGGAGTAGCGCCGGGCTCCCTCCGGGGTGCAGCCGCCGTCGGGGGAAGGGCGCCACAGGCCGGGAAGACCTCCTCCCTTTGTGTCCAGTAGTGGGGTCCACCGGAGGGCGGCCCGTGGGCCGGGCCTCACCGCGGCGCTCCGGGACTGTGGGGTCAGGCTGCGTTGGGTGGACGCCCACCTCGCCAACCTTCGGAGGTCCCTGGGGGTCTTCGTGCGCCCCGGGGCTGCAGAGATCCAGGGGAGGCGCCTGTGAGGCCCGGACCTGCCCCGGGGCGAAGGGTATGTGGCGAGACAGAGCCCTGCACCCCTAATTCCCGGTGGAAAACTCCTGTTGCCGTTTCCCTCCACCGGCCTGGAGTCTCCCAGTCTTGTCCCGGCAGTGCCGCCCTCCCCACTAAGACCTAGGCGCAAAGGCTTGGCTCATGGTTGACAGCTCAGAGAGAGAAAGATCTGAGGGAAGATG
+  ......((((..((...((.(((((((((((((((((........)))))))).(((((.........)))))))))))).)).))..))...))))........(((((....(((((.((.(((((....((((((.(.((((....)))).).))))))..))))).)).(((((.((((((((((((((...(((.((.((.(((((((((.((....)).((((....))))))))))))).)))))))...))))....(((((((((.((.((.((((((....)))))).)))).))).....)))))).)))))))))).)).)))))))))))))........((((((((.((((((...(((...((.(((((((...))..))))).)))))...)))).)))))...)))))..(((((..........((..(.(.(..((((.(((..(((((((...((.((...(((((((.....................)).)))))...)).))..))))).)).(((...........)))..))).)))))).).)))))))....
+  
  */

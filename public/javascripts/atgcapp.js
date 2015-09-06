@@ -65,8 +65,10 @@ ATGC.App.prototype.mouseMove = function(event, p) {
 
   // ignore unless we are dragging a vertex
   if (this.state === ATGC.App.UI_FSM.DragVertex) {
-    // move the vertex element to given position
-    this.dragVertex.element.updatePosition(p);
+
+    // move the vertex element to given position and bring in/out edges with it
+    this.graph.moveVertex(this.dragVertex, p);
+
   }
 };
 
@@ -80,7 +82,6 @@ ATGC.App.prototype.mouseUp = function(event, p) {
 
   // ignore unless we are dragging a vertex
   if (this.state === ATGC.App.UI_FSM.DragVertex) {
-    console.log('end drag vertex');
     // back to edit mode
     this.enterState(ATGC.App.UI_FSM.EditGraph);
   }
@@ -116,7 +117,8 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.SequenceError:
 
       var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
-      alert(dbn.validate());
+      this.errorSpan.innerText = dbn.validate();
+      this.errorSpan.classList.remove('hidden');
 
       break;
 
@@ -129,6 +131,9 @@ ATGC.App.prototype.enterState = function(state) {
 
       // start a timer to improve the layout until we exit this state
       this.displayTimer = setInterval(this.evolveGraph.bind(this), ATGC.Display.kGRAPH_UPDATE_TIME * 2);
+
+      // hide any previous errors
+      this.errorSpan.classList.add('hidden');
 
       break;
 

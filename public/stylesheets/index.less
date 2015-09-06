@@ -6,7 +6,7 @@
 
 
 // min height of display area
-@min-graph-height: 600px;
+@min-graph-height: 665px;
 
 // color of display surface-color
 @surface-color: white;
@@ -38,6 +38,8 @@
   font-size: 12px;
   transform: translateX(-50%) translateY(-50%);
   z-index: @vertex-z;
+  border: 2px solid lightgray;
+  box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.97);
 }
 // centered text on nucleotide
 .nucleotide-text {
@@ -53,4 +55,10 @@
 .edge {
   .displayElement;
   z-index: @edge-z;
+}
+
+// error message for DBN format.
+.error-span {
+  margin-left: 1rem;
+  color: @brand-danger;
 }

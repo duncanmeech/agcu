@@ -85,6 +85,29 @@ ATGC.Display.prototype.findVertex = function(sp) {
 };
 
 /**
+ * move the vertex/nucleotide and adjust any in/out edges
+ * @param  {[type]} vertex [description]
+ * @param  {[type]} p      [description]
+ * @return {[type]}        [description]
+ */
+ATGC.Display.prototype.moveVertex = function(vertex, p) {
+
+  // move vertex itself
+  vertex.element.updatePosition(p);
+
+  // update end point of in edges
+  _.each(vertex.inEdges, function(e) {
+    e.element.updatePosition(e.element.start, p);
+  });
+
+  // update outbound edges
+  _.each(vertex.outEdges, function(e) {
+    e.element.updatePosition(p, e.element.end);
+  });
+
+};
+
+/**
  * show the given sequence, which we assume is valid
  * @param  {ATGC.DBN} dbn
  */
@@ -138,7 +161,7 @@ ATGC.Display.prototype.getDisplayBounds = function() {
  * ms per update cycle of the force directed graph
  * @type {Number}
  */
-ATGC.Display.kGRAPH_UPDATE_TIME = 100;
+ATGC.Display.kGRAPH_UPDATE_TIME = 50;
 
 /**
  * callback from graph when we should create a vertex element
