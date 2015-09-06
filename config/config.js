@@ -5,7 +5,7 @@ module.exports = {
 
     mongourl: "",
 
-    mongourlProduction : 'mongodb://admin:j4f6d2e9@ds035573.mongolab.com:35573/heroku_gwg1zrlq',
+    mongourlProduction : 'mongodb://heroku_gwg1zrlq:qaef2ue0ugp0ojctia2fcugdtt@ds035573.mongolab.com:35573/heroku_gwg1zrlq',
 
     // local DB for development, cubool-local
     mongourlDevelopment: 'mongodb://127.0.0.1/nucleotides',
