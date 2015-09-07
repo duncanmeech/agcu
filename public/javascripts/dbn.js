@@ -66,11 +66,11 @@ ATGC.DBN.validPair = function(from, to) {
 };
 
 ATGC.DBN.validPairHash = {
-  A: "TU",
-  T: "AU",
+  A: "TUA",
+  T: "AUT",
   U: "TA",
-  G: "C",
-  C: "G"
+  G: "CG",
+  C: "GC"
 };
 
 /**

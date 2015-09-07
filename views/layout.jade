@@ -2,10 +2,20 @@ doctype html
 html
   head
     title="Nucleotides"
+    
+    // bootstrap
+    script(src='https://code.jquery.com/jquery-2.1.4.min.js')
+    script(src='bootstrap/dist/js/bootstrap.min.js')
     link(rel='stylesheet', href='/bootstrap/dist/css/bootstrap.min.css')
+    
+    // app css
     link(rel='stylesheet', href='/stylesheets/style.css')
+    
+    // core 3rd party libraries
     script(src='underscore/underscore-min.js')
     script(src='underscore.string/dist/underscore.string.min.js')
+    
+    // create a head block for inheriting pages
     block head
 
   body

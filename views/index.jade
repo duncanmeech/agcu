@@ -2,8 +2,11 @@ extends layout
 
 block head
 
+  
+  // styles for main page
   link(rel='stylesheet', href='/stylesheets/index.css')
 
+  // all applications scripts
   script(src='node-uuid/uuid.js')
   script(src='javascripts/color.js')
   script(src='javascripts/core.js')
@@ -17,6 +20,7 @@ block head
   script(src='javascripts/events.js')
   script(src='javascripts/xhr.js')
   script(src='javascripts/consts.js')
+  script(src='javascripts/settings.js')
   script(src='javascripts/atgcapp.js')
 
 block content
@@ -50,5 +54,40 @@ block content
       button.btn.btn-success.btn-xs(data-element="displayButton") Display Sequence
       button.btn.btn-primary.btn-xs(data-element="newButton") New Sequence
       button.btn.btn-primary.btn-xs(data-element="shareButton") Save Sequence
+      button.btn.btn-default.btn-xs(data-element="settingsButton") Settings
+      
   
     div(data-element="displaySurface")
+    
+    .modal.fade(data-dialog='settings')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            h3.modal-title Appearance / Display Settings
+          .modal-body
+            form.form-horizontal.sequence-form(data-element="sequenceForm")
+            
+              .form-group
+                label.col-sm-4.control-label Base Color
+                .col-sm-8
+                  input#baseColor.form-control(placeholder="e.g. A=magenta or G=rgb(1,2,3)")
+
+              .form-group
+                label.col-sm-4.control-label Base Size
+                .col-sm-8
+                  input#baseSize.form-control(placeholder="A number in the range 10 -> 50")
+  
+              .form-group
+                label.col-sm-4.control-label Font
+                .col-sm-8
+                  input#baseFont.form-control(placeholder="e.g. Arial or Verdana") 
+                  
+              .form-group
+                label.col-sm-4.control-label Line Width
+                .col-sm-8
+                  input#lineWidth.form-control(placeholder="A number in the range 1 -> 20")          
+
+
+          .modal-footer
+            button.btn.btn-default(data-element='cancel-button', type='button') Cancel
+            button.btn.btn-primary(data-element='confirm-button', type='button') Apply

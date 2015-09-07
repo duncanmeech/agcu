@@ -40,13 +40,16 @@ ATGC.App.prototype.UISetup = function() {
   Events.I().subscribe(Events.COMPLETE_EDGE, this.onCompleteEdge.bind(this));
 
   // new sequence can be triggered from the toolbar also
-  this.displayButton.addEventListener('click', this.onNewSequence.bind(this));
+  this.displayButton.addEventListener('click', this.onDisplaySequence.bind(this));
 
   // share button handler
   this.shareButton.addEventListener('click', this.onSave.bind(this));
 
   // new button handler
   this.newButton.addEventListener('click', this.onNew.bind(this));
+
+  // settings handler
+  this.settingsButton.addEventListener('click', this.onSettings.bind(this));
 
   // track keyboard interactions with inputs
   this.sequenceInput.addEventListener('keyup', this.onInputKeyup.bind(this));
@@ -57,6 +60,57 @@ ATGC.App.prototype.UISetup = function() {
 
   // set initial UI state
   this.enterState(ATGC.App.UI_FSM.Initialize);
+};
+
+/**
+ * run the settings dialog
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.onSettings = function() {
+  // create dialog once only on demand
+
+  if (!this.dialog) {
+
+    // initialize but don't show
+
+    this.dialog = $('[data-dialog=settings]').modal({
+      show: false,
+      keyboard: false,
+      backdrop: 'static'
+    });
+
+    // sink events
+
+    $('[data-element=cancel-button]', this.dialog).click($.proxy(function() {
+
+      // user cancelled
+      this.dialog.modal('hide');
+
+    }, this));
+
+    $('[data-element=confirm-button]', this.dialog).click($.proxy(function() {
+
+      // close dialog
+      this.dialog.modal('hide');
+
+      // apply new settings
+      S.I().apply({
+        baseColor: document.getElementById('baseColor').value,
+        baseSize: document.getElementById('baseSize').value,
+        baseFont: document.getElementById('baseFont').value,
+        lineWidth: document.getElementById('lineWidth').value,
+      });
+
+      // redisplay Graph
+      this.vertices = null;
+      this.enterState(ATGC.App.UI_FSM.NewSequence);
+
+    }, this));
+
+  }
+
+  // run dialog
+  this.dialog.modal('show');
 };
 
 /**
@@ -272,6 +326,16 @@ ATGC.App.prototype.mouseUp = function(event, p) {
     // back to edit mode
     this.enterState(ATGC.App.UI_FSM.EditGraph);
   }
+};
+
+/**
+ * display sequence was clicked
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.onDisplaySequence = function() {
+  // remove vertices to ensure a fresh layout
+  this.vertices = null;
+  this.enterState(ATGC.App.UI_FSM.NewSequence);
 };
 
 /**

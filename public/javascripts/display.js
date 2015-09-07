@@ -132,7 +132,7 @@ ATGC.Display.prototype.findVertex = function(sp) {
     var d = new ATGC.layout.Line(sp.x, sp.y, vx, vy).length;
 
     // if distance is within radius of vertex then its a hit
-    if (d < ATGC.kNR) {
+    if (d < S.I().baseSize) {
       hit = v;
     }
 
@@ -335,7 +335,7 @@ ATGC.Display.prototype.continueLayout = function() {
  */
 ATGC.Display.prototype.getDisplayBounds = function() {
 
-  return new ATGC.layout.Box(ATGC.kNR_MAX, ATGC.kNR_MAX, this.el.clientWidth - ATGC.kNR_MAX * 2, this.el.clientHeight - ATGC.kNR_MAX * 2);
+  return new ATGC.layout.Box(S.I().baseSize, S.I().baseSize, this.el.clientWidth - S.I().baseSize * 2, this.el.clientHeight - S.I().baseSize * 2);
 };
 
 /**

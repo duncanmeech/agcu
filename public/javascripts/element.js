@@ -1,13 +1,6 @@
 var ATGC = ATGC || {};
 
 
-/**
- * default size for nucleotides and min/max size
- * @type {Number}
- */
-ATGC.kNR = 26;
-ATGC.kNR_MAX = 50;
-ATGC.kNR_MIN = 10;
 
 /**
  * nucleotides are the vertices in our directed graph
@@ -18,16 +11,18 @@ ATGC.Nucleotide = function(nucleotide) {
   this.nucleotide = nucleotide;
   this.el = document.createElement('div');
   this.el.classList.add('nucleotide');
-  this.el.style.width = _.sprintf('%spx', ATGC.kNR);
-  this.el.style.height = _.sprintf('%spx', ATGC.kNR);
+  this.el.style.width = _.sprintf('%spx', S.I().baseSize);
+  this.el.style.height = _.sprintf('%spx', S.I().baseSize);
+  this.el.style.fontFamily = S.I().baseFont;
 
   this.tel = document.createElement('div');
   this.tel.classList.add('nucleotide-text');
   this.tel.innerText = this.nucleotide;
   this.el.appendChild(this.tel);
 
-  U.ASSERT(ATGC.Nucleotide.COLORS[this.nucleotide], 'No color for given text');
-  this.el.style.backgroundColor = ATGC.Nucleotide.COLORS[this.nucleotide];
+  var color = S.I().baseColors[this.nucleotide];
+  U.ASSERT(color, 'No color for given text');
+  this.el.style.backgroundColor = color;
 };
 
 /**
@@ -37,19 +32,6 @@ ATGC.Nucleotide = function(nucleotide) {
 ATGC.Nucleotide.prototype.updatePosition = function(vector) {
   this.el.style.left = vector.x + 'px';
   this.el.style.top = vector.y + 'px';
-};
-
-/**
- * default colors for nucleotides
- * @type {Object}
- */
-ATGC.Nucleotide.COLORS = {
-  A: '#1f77b4',
-  T: '#aec7e8',
-  G: '#ff7f0e',
-  U: '#98df8a',
-  I: '#d62728',
-  C: '#9467bd'
 };
 
 /**
@@ -65,7 +47,7 @@ ATGC.Edge = function(graphedge) {
   switch (graphedge.type) {
 
     case ATGC.DBN.NUCLEOTIDE:
-      this.thickness = 5;
+      this.thickness = S.I().lineWidth;
       this.color = '#d62728';
       break;
 
