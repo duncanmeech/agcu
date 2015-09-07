@@ -16,6 +16,9 @@ ATGC.Display = function(el) {
   this.el.addEventListener('mouseup', this.mouseUp.bind(this));
   this.el.addEventListener('mouseenter', this.mouseEnter.bind(this));
   this.el.addEventListener('mouseleave', this.mouseLeave.bind(this));
+
+  // listen for certain app events as well
+  Events.I().subscribe(Events.HIGHLIGHT_VERTEX, this.highlightVertex.bind(this));
 };
 
 /**
@@ -24,29 +27,12 @@ ATGC.Display = function(el) {
  * @return {[type]}   [description]
  */
 ATGC.Display.prototype.mouseEnter = function(e) {
-  console.log("Enter");
+  Events.I().publish(Events.MOUSE_ENTER);
 };
 ATGC.Display.prototype.mouseLeave = function(e) {
-  console.log("Leave");
+  Events.I().publish(Events.MOUSE_LEAVE);
 };
 
-
-/**
- * mouse move handler
- * @param  {[type]} e [description]
- * @return {[type]}   [description]
- */
-ATGC.Display.prototype.mouseDown = function(e) {
-
-  // transform point
-  var p = D.mouseToLocal(e, this.el);
-  var v = this.findVertex(p);
-
-  // signal that the user has grabbed a vertex
-  if (v) {
-    Events.I().publish(Events.VERTEX_PICKED, v);
-  }
-};
 
 /**
  * mouse move handler
@@ -118,6 +104,30 @@ ATGC.Display.prototype.findVertex = function(sp) {
 };
 
 /**
+ * highlight a vertex indicated by the given index
+ * @param  {[type]} event [description]
+ * @param  {[type]} index [description]
+ * @return {[type]}       [description]
+ */
+ATGC.Display.prototype.highlightVertex = function(event, index) {
+
+  var v = null;
+  this.layout.eachVertex(function(_v) {
+    if (_v.index === index) {
+      v = _v;
+    }
+  });
+
+  // if we found a vertex then highlight it for a short while
+  if (v) {
+    v.element.el.classList.add('nucleotide-highlighted');
+    _.delay(function() {
+      v.element.el.classList.remove('nucleotide-highlighted');
+    },400);
+  }
+};
+
+/**
  * move the vertex/nucleotide and adjust any in/out edges
  * @param  {[type]} vertex [description]
  * @param  {[type]} p      [description]
@@ -143,7 +153,7 @@ ATGC.Display.prototype.moveVertex = function(vertex, p) {
 /**
  * clear the current display
  */
-ATGC.Display.prototype.reset = function () {
+ATGC.Display.prototype.reset = function() {
 
   // clear the current graph and DBN
   D.empty(this.el);

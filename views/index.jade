@@ -35,11 +35,11 @@ block content
       .form-group
         label.col-sm-2.control-label Nucleotides
         .col-sm-10
-          div#SEQ.form-control.editbox(data-element="sequenceInput" contenteditable="true")
+          input#SEQ.form-control.mono(data-element="sequenceInput" placeholder='e.g. ATGC')
       .form-group
         label.col-sm-2.control-label(for='DBN') D.B.N.
         .col-sm-10
-          div#DBN.form-control.editbox(contenteditable="true" data-element="dbnInput")
+          input#DBN.form-control.mono(type='text' placeholder='e.g. ..()..' data-element="dbnInput")
       .form-group
         label.col-sm-2.control-label(for='URL') Share URL
         .col-sm-10

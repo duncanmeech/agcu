@@ -28,6 +28,7 @@ ATGC.App.prototype.UISetup = function() {
   // mouse events, only handled within the context of a vertex drag
   Events.I().subscribe(Events.MOUSE_MOVE, this.mouseMove.bind(this));
   Events.I().subscribe(Events.MOUSE_UP, this.mouseUp.bind(this));
+  Events.I().subscribe(Events.MOUSE_LEAVE, this.removeAsterisks.bind(this));
 
   // new sequence event
   Events.I().subscribe(Events.NEW_SEQUENCE, this.onNewSequence.bind(this));
@@ -40,6 +41,10 @@ ATGC.App.prototype.UISetup = function() {
 
   // new button handler
   this.newButton.addEventListener('click', this.onNew.bind(this));
+
+  // track keyboard interactions with inputs
+  this.sequenceInput.addEventListener('keyup', this.onInputKeyup.bind(this));
+  this.dbnInput.addEventListener('keyup', this.onInputKeyup.bind(this));
 
   // initialize graph display surface
   this.graph = new ATGC.Display(this.displaySurface);
@@ -103,20 +108,61 @@ ATGC.App.prototype.mouseMove = function(event, p, v) {
     this.graph.moveVertex(this.dragVertex, p);
   }
 
-  // if we were given a vertex highlight in the DBN sequence inputs
+  // if we were given a vertex highlight in the DBN/sequence inputs
   if (v && this.dbn) {
 
     // highlight with an asterix
     var s = this.dbn.sequence;
     s = s.substr(0, v.index) + '*' + s.substr(v.index);
-    this.sequenceInput.innerHTML = s;
+    this.sequenceInput.value = s;
 
     s = this.dbn.dbn;
     s = s.substr(0, v.index) + '*' + s.substr(v.index);
-    this.dbnInput.innerHTML = s;
+    this.dbnInput.value = s;
   }
 };
 
+/**
+ * ensure the asterisks are removed from the inputs
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.removeAsterisks = function() {
+
+  // this removes all formatting as well
+  this.sequenceInput.value = (this.sequenceInput.value || '').replace('*', '');
+  this.dbnInput.value = (this.dbnInput.value || '').replace('*', '');
+
+};
+
+/**
+ * get caret position of input and highlight that vertex with a signal
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+ATGC.App.prototype.onInputKeyup = function (e) {
+  var index = this.getCaretPos(e.currentTarget);
+  Events.I().publish(Events.HIGHLIGHT_VERTEX, index);
+};
+
+/**
+ * get caret position in input
+ * @param  {[type]} input [description]
+ * @return {[type]}       [description]
+ */
+ATGC.App.prototype.getCaretPos = function(input) {
+
+  if (document.selection && document.selection.createRange) {
+    var range = document.selection.createRange();
+    var bookmark = range.getBookmark();
+    var caret_pos = bookmark.charCodeAt(2) - 2;
+  } else {
+    // Firefox Caret Position (TextArea)
+    if (input.setSelectionRange)
+      var caret_pos = input.selectionStart;
+  }
+
+  return caret_pos;
+}
 
 /**
  * mouse move handler
@@ -190,8 +236,8 @@ ATGC.App.prototype.enterState = function(state) {
 
       } else {
         // set default sequence
-        this.sequenceInput.innerHTML = 'CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA';
-        this.dbnInput.innerHTML = '..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..';
+        this.sequenceInput.value = 'CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA';
+        this.dbnInput.value = '..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..';
         this.enterState(ATGC.App.UI_FSM.NewSequence);
 
       }
@@ -202,8 +248,8 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.CreateNew:
 
       this.documentID = null;
-      this.sequenceInput.innerHTML = '';
-      this.dbnInput.innerHTML = '';
+      this.sequenceInput.value = '';
+      this.dbnInput.value = '';
       this.updateShareURL();
       this.graph.reset();
 
@@ -220,8 +266,8 @@ ATGC.App.prototype.enterState = function(state) {
 
         if (error === K.API_NO_ERROR) {
           // display the sequence including validation
-          this.sequenceInput.innerHTML = sequence;
-          this.dbnInput.innerHTML = dbn;
+          this.sequenceInput.value = sequence;
+          this.dbnInput.value = dbn;
           this.enterState(ATGC.App.UI_FSM.NewSequence);
 
         } else {
@@ -278,7 +324,7 @@ ATGC.App.prototype.enterState = function(state) {
       // validate and display new sequence
     case ATGC.App.UI_FSM.NewSequence:
 
-      var dbn = new ATGC.DBN(this.sequenceInput.innerText, this.dbnInput.innerText);
+      var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
       var error = dbn.validate();
       this.enterState(error ? ATGC.App.UI_FSM.SequenceError : ATGC.App.UI_FSM.DisplaySequence);
 
@@ -287,7 +333,7 @@ ATGC.App.prototype.enterState = function(state) {
       // current sequence has an error, display it
     case ATGC.App.UI_FSM.SequenceError:
 
-      var dbn = new ATGC.DBN(this.sequenceInput.innerText, this.dbnInput.innerText);
+      var dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
       this.showError(dbn.validate());
 
       break;
@@ -296,7 +342,7 @@ ATGC.App.prototype.enterState = function(state) {
     case ATGC.App.UI_FSM.DisplaySequence:
 
       // sequence appears valid, display it
-      this.dbn = new ATGC.DBN(this.sequenceInput.innerText, this.dbnInput.innerText);
+      this.dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
       this.graph.showSequence(this.dbn);
 
       // start a timer to improve the layout until we exit this state

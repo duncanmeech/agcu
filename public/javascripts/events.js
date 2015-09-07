@@ -101,11 +101,15 @@ Events.prototype.publish = function(event) {
 // user grabbed a vertex to move
 Events.VERTEX_PICKED = 'vertex-picked';
 
-// generic mouse move on the display surface
-Events.MOUSE_MOVE = 'mouse-move';
+// highlight a vertex by index
+Events.HIGHLIGHT_VERTEX = 'hilight-vertex';
 
-// generic mouse up on the display surface
+// generic mouse events from the displat
+Events.MOUSE_MOVE = 'mouse-move';
 Events.MOUSE_UP = 'mouse-up';
+Events.MOUSE_ENTER = 'mouse-up';
+Events.MOUSE_LEAVE = 'mouse-up';
+
 
 // start displaying a new sequence
 Events.NEW_SEQUENCE = 'new-sequence';

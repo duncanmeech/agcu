@@ -13,12 +13,10 @@
 @surface-color: white;
 
 // inputs in the sequence form as monospaced
-.editbox {
-  overflow: scroll;
-  height:6rem;
+.mono {
   font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
   letter-spacing: 2px;
-  font-size: 1.8rem;
+  font-weight: bold;
 }
 
 
@@ -48,10 +46,15 @@
   cursor: pointer;
   transition: transform 100ms ease;
 }
-.nucleotide:hover {
+// highlight state for nucleotide
+.nucleotide-highlighted {
   transform: scale(1.5, 1.5) translateX(-25%) translateY(-25%);
   z-index: @top-z;
   border: 2px solid white;
+}
+// hover state
+.nucleotide:hover {
+  .nucleotide-highlighted;
 }
 // centered text on nucleotide
 .nucleotide-text {
@@ -82,10 +85,12 @@
 }
 // action toolbar
 .toolbar {
-  border: 1px solid @input-border;
-  padding: 1rem;
   margin-bottom: 1rem;
 }
 .toolbar * {
   margin-right: 1rem;
+}
+// override some bootstrap for better layout
+.form-group {
+  margin-bottom: 3px;
 }
