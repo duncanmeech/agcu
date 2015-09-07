@@ -115,6 +115,8 @@ ATGC.App.prototype.hasNucleotideBond = function(vertex) {
 
 };
 
+
+
 /**
  * if legal complete an edge between the two vertices
  * @param  {[type]} event [description]
@@ -127,6 +129,9 @@ ATGC.App.prototype.onCompleteEdge = function(event, v1, v2) {
   // remove any previous alerts, this may generate new ones
   this.hideAlerts();
 
+  // back to edit mode regardless of whether connection is valid
+  this.enterState(ATGC.App.UI_FSM.EditGraph);
+
   // cannot connect to self and both vertices must exist
   if (!v2 || !v1 || v1.index === v2.index) {
     this.showError('That nucleotide connection is invalid.');
@@ -136,6 +141,12 @@ ATGC.App.prototype.onCompleteEdge = function(event, v1, v2) {
   // if either vertex already has a nucleotide bond its invalid
   if (this.hasNucleotideBond(v1) || this.hasNucleotideBond(v2)) {
     this.showError('Existing nucleotide connection exists on that vertex.');
+    return;
+  }
+
+  // validate nucleotide pairings
+  if (!ATGC.DBN.validPair(v1.nucleotide, v2.nucleotide)) {
+    this.showError('Invalid nucleotide pairing.');
     return;
   }
 
@@ -155,8 +166,6 @@ ATGC.App.prototype.onCompleteEdge = function(event, v1, v2) {
     this.showError('That connection does not produce valid DBN');
   }
 
-  // back to edit mode regardless of whether connection was valid
-  this.enterState(ATGC.App.UI_FSM.EditGraph);
 };
 
 

@@ -6,7 +6,7 @@ var ATGC = ATGC || {};
  * @param {String} sequence
  * @param {String} dbn
  */
-ATGC.DBN = function (sequence, dbn) {
+ATGC.DBN = function(sequence, dbn) {
 
   // sequence should be upper case with no white space at either end
   this.sequence = sequence ? _.trim(sequence.toUpperCase()) : sequence;
@@ -19,7 +19,7 @@ ATGC.DBN = function (sequence, dbn) {
  * clone this DBN, used for temporary validation etc
  * @return {ATGC.DBN} new instance of DBN
  */
-ATGC.DBN.prototype.clone = function () {
+ATGC.DBN.prototype.clone = function() {
 
   return new ATGC.DBN(this.sequence, this.dbn);
 
@@ -49,9 +49,34 @@ ATGC.DBN.prototype.addConnection = function(i1, i2) {
 };
 
 /**
+ * static method to valid if connection between nucleotides is valid.
+ * Allowed are A->T, A->U, T->A, U->T, G->C or C->G
+ * @param  {[type]} from [description]
+ * @param  {[type]} to   [description]
+ * @return {[type]}      [description]
+ */
+ATGC.DBN.validPair = function(from, to) {
+
+  // simple lookup
+  if (!ATGC.DBN.validPairHash[from.toUpperCase()]) {
+    return false;
+  }
+
+  return ATGC.DBN.validPairHash[from.toUpperCase()].indexOf(to.toUpperCase()) >= 0;
+};
+
+ATGC.DBN.validPairHash = {
+  A: "TU",
+  T: "AU",
+  U: "TA",
+  G: "C",
+  C: "G"
+};
+
+/**
  * populates the given directed graph object
  */
-ATGC.DBN.prototype.populateGraph = function (g) {
+ATGC.DBN.prototype.populateGraph = function(g) {
 
   // iterate sequence/dbn, back link whenever a closing paranthesis is encounter.
   // Each vertex is given properties that store the index into the sequence,
@@ -60,7 +85,7 @@ ATGC.DBN.prototype.populateGraph = function (g) {
   var stack = [];
   var previous;
 
-  for(var i = 0; i < this.sequence.length; i += 1) {
+  for (var i = 0; i < this.sequence.length; i += 1) {
 
     var v = g.addVertex({
       index: i,
@@ -98,7 +123,7 @@ ATGC.DBN.prototype.populateGraph = function (g) {
  * validate the current sequence.
  * @return string error message or null if no error
  */
-ATGC.DBN.prototype.validate = function () {
+ATGC.DBN.prototype.validate = function() {
 
   // 1. sequences should not be empty.
   if (!this.sequence || !this.dbn) {
