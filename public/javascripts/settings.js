@@ -34,9 +34,22 @@ S.kLW_MIN = 1;
  * @return {Events}
  */
 S.I = function() {
+
   if (!S._I) {
     S._I = new S();
+
+    // override with saved settings
+    var obj = window.localStorage.getItem('ATGC_Settings');
+    if (obj) {
+      obj = JSON.parse(obj);
+      S._I.baseColors = obj.baseColors;
+      S._I.baseSize = obj.baseSize;
+      S._I.baseFont = obj.baseFont;
+      S._I.lineWidth = obj.lineWidth;
+    }
+
   }
+
   return S._I;
 };
 
@@ -69,5 +82,13 @@ S.prototype.apply = function(obj) {
   if (s && !_.isNaN(s) && _.isNumber(s)) {
     this.lineWidth = Math.max(S.kLW_MIN, Math.min(S.kLW_MAX, s));
   }
+
+  // save to storage
+  window.localStorage.setItem('ATGC_Settings', JSON.stringify({
+    baseColors : this.baseColors,
+    baseSize: this.baseSize,
+    baseFont: this.baseFont,
+    lineWidth: this.lineWidth
+  }));
 
 };
