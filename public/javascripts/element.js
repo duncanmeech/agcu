@@ -65,8 +65,8 @@ ATGC.Edge = function(graphedge) {
   switch (graphedge.type) {
 
     case ATGC.DBN.NUCLEOTIDE:
-      this.thickness = 8;
-      this.color = 'red';
+      this.thickness = 5;
+      this.color = '#d62728';
       break;
 
     case ATGC.DBN.BACKBONE:

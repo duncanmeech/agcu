@@ -9,12 +9,13 @@ router.get('/', function(req, res, next) {
 });
 
 /* save a document */
-router.get('/api/create/:seq/:dbn', function(req, res, next) {
+router.get('/api/create/:seq/:dbn/:vertices', function(req, res, next) {
 
   // create a JSON string object from the sequence and dbn
   var document = JSON.stringify({
     sequence: req.params.seq,
-    dbn: req.params.dbn
+    dbn: req.params.dbn,
+    vertices: req.params.vertices
   });
 
   // create and save the document, returning the error code
@@ -38,18 +39,20 @@ router.get('/api/load/:id', function(req, res, next) {
     res.send({
       error: K.API_NO_ERROR,
       sequence: temp.sequence,
-      dbn: temp.dbn
+      dbn: temp.dbn,
+      vertices: temp.vertices
     });
   });
 });
 
 /* save / update an existing document */
-router.get('/api/save/:id/:seq/:dbn', function(req, res, next) {
+router.get('/api/save/:id/:seq/:dbn/:vertices', function(req, res, next) {
 
   // create a JSON string object from the sequence and dbn
   var document = JSON.stringify({
     sequence: req.params.seq,
-    dbn: req.params.dbn
+    dbn: req.params.dbn,
+    vertices: req.param.vertices
   });
 
   var document = graph.save(req.params.id, document, function(error) {

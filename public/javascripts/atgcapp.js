@@ -139,7 +139,7 @@ ATGC.App.prototype.removeAsterisks = function() {
  * @param  {[type]} e [description]
  * @return {[type]}   [description]
  */
-ATGC.App.prototype.onInputKeyup = function (e) {
+ATGC.App.prototype.onInputKeyup = function(e) {
   var index = this.getCaretPos(e.currentTarget);
   Events.I().publish(Events.HIGHLIGHT_VERTEX, index);
 };
@@ -250,6 +250,7 @@ ATGC.App.prototype.enterState = function(state) {
       this.documentID = null;
       this.sequenceInput.value = '';
       this.dbnInput.value = '';
+      this.vertices = null;
       this.updateShareURL();
       this.graph.reset();
 
@@ -262,12 +263,13 @@ ATGC.App.prototype.enterState = function(state) {
 
       this.updateShareURL();
 
-      X.Load(this.documentID, function(error, sequence, dbn) {
+      X.Load(this.documentID, function(error, sequence, dbn, vertices) {
 
         if (error === K.API_NO_ERROR) {
           // display the sequence including validation
           this.sequenceInput.value = sequence;
           this.dbnInput.value = dbn;
+          this.vertices = vertices;
           this.enterState(ATGC.App.UI_FSM.NewSequence);
 
         } else {
@@ -287,7 +289,7 @@ ATGC.App.prototype.enterState = function(state) {
       if (this.documentID) {
 
         // save existing document
-        X.Save(this.documentID, this.dbn.sequence, this.dbn.dbn, function(error) {
+        X.Save(this.documentID, this.dbn.sequence, this.dbn.dbn, this.graph.serializeVertices(), function(error) {
 
           if (error === K.API_NO_ERROR) {
             this.showSuccess('Your sequence was successfully saved.');
@@ -303,7 +305,7 @@ ATGC.App.prototype.enterState = function(state) {
       } else {
 
         // create a new document
-        X.Create(this.dbn, function(error, id) {
+        X.Create(this.dbn, this.graph.serializeVertices(), function(error, id) {
 
           if (error === K.API_NO_ERROR) {
             this.showSuccess('Your sequence was successfully saved.');
@@ -343,10 +345,17 @@ ATGC.App.prototype.enterState = function(state) {
 
       // sequence appears valid, display it
       this.dbn = new ATGC.DBN(this.sequenceInput.value, this.dbnInput.value);
-      this.graph.showSequence(this.dbn);
+      this.graph.showSequence(this.dbn, this.vertices);
 
-      // start a timer to improve the layout until we exit this state
-      this.displayTimer = setInterval(this.evolveGraph.bind(this), ATGC.Display.kGRAPH_UPDATE_TIME * 2);
+      // if vertices positions available go to edit mode, otherwise start a layout
+      if (this.vertices) {
+
+        this.enterState(ATGC.App.UI_FSM.EditGraph);
+
+      } else {
+        // start a timer to improve the layout until we exit this state
+        this.displayTimer = setInterval(this.evolveGraph.bind(this), ATGC.Display.kGRAPH_UPDATE_TIME * 2);
+      }
 
       // hide any previous errors
       this.hideAlerts();
@@ -392,12 +401,13 @@ ATGC.App.prototype.exitState = function() {
 
   switch (this.state) {
 
-    // cancel the update timer
+    // cancel the update timer, if running
     case ATGC.App.UI_FSM.DisplaySequence:
 
-      U.ASSERT(this.displayTimer, 'Expected a timer to be running');
-      clearInterval(this.displayTimer);
-      this.displayTimer = null;
+      if (this.displayTimer) {
+        clearInterval(this.displayTimer);
+        this.displayTimer = null;
+      }
 
       break;
   }

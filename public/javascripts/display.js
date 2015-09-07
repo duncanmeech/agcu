@@ -123,7 +123,7 @@ ATGC.Display.prototype.highlightVertex = function(event, index) {
     v.element.el.classList.add('nucleotide-highlighted');
     _.delay(function() {
       v.element.el.classList.remove('nucleotide-highlighted');
-    },400);
+    }, 400);
   }
 };
 
@@ -162,10 +162,13 @@ ATGC.Display.prototype.reset = function() {
 };
 
 /**
- * show the given sequence, which we assume is valid
+ * show the given sequence, which we assume is valid.
+ * The vertices, if present, are the normalized, serialized
+ * position of the graph when it was saved.
  * @param  {ATGC.DBN} dbn
+ * @param {Array of Vertices}
  */
-ATGC.Display.prototype.showSequence = function(dbn) {
+ATGC.Display.prototype.showSequence = function(dbn, vertices) {
 
   U.ASSERT(dbn && !dbn.validate(), 'Bad Sequence');
 
@@ -185,8 +188,52 @@ ATGC.Display.prototype.showSequence = function(dbn) {
   // create a layout strategy and perform initial update
   this.layout = new ATGC.layout.GraphForceDirected(this.graph, {});
 
-  // perform a short initial layout.
-  this.layout.update(this.getDisplayBounds(), ATGC.Display.kGRAPH_UPDATE_TIME);
+  if (vertices) {
+
+    // restore serialized, normalize vertices
+    this.restoreVertices(vertices);
+
+  } else {
+
+    // perform a short initial layout.
+    this.layout.update(this.getDisplayBounds(), ATGC.Display.kGRAPH_UPDATE_TIME);
+  }
+
+};
+
+/**
+ * restore position of vertices
+ * @param  {[type]} vertices [description]
+ * @return {[type]}          [description]
+ */
+ATGC.Display.prototype.restoreVertices = function(vertices) {
+
+  var b = this.getDisplayBounds();
+
+  // update edges first, then vertices
+  //
+  this.layout.eachVertex(function(v) {
+
+    var x = vertices[v.index].x * b.w;
+    var y = vertices[v.index].y * b.h;
+
+    // apply position to start/end edges connected to this vertex as well
+    _.each(v.inEdges , function(e){
+      e.element.end = new ATGC.layout.Vector(x, y);
+    });
+    _.each(v.outEdges , function(e){
+      e.element.start = new ATGC.layout.Vector(x, y);
+    });
+
+  }.bind(this));
+
+  this.layout.eachVertex(function(v) {
+
+    var x = vertices[v.index].x * b.w;
+    var y = vertices[v.index].y * b.h;
+    this.moveVertex(v, new ATGC.layout.Vector(x, y));
+
+  }.bind(this));
 
 };
 
@@ -216,6 +263,30 @@ ATGC.Display.prototype.getDisplayBounds = function() {
  * @type {Number}
  */
 ATGC.Display.kGRAPH_UPDATE_TIME = 50;
+
+
+/**
+ * return the normalized position of all vertices in the graph as
+ * string that can be parsed by JSON.parse back into an array of x/y objects
+ * @return {String}
+ */
+ATGC.Display.prototype.serializeVertices = function() {
+
+  var b = this.getDisplayBounds();
+  var vertices = [];
+
+  this.layout.eachVertex(function(v) {
+
+    var x = parseFloat(v.element.el.style.left);
+    var y = parseFloat(v.element.el.style.top);
+
+    vertices.push({
+      x: x / b.w,
+      y: y / b.h
+    });
+  });
+  return JSON.stringify(vertices);
+};
 
 /**
  * callback from graph when we should create a vertex element

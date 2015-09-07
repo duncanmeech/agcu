@@ -17,7 +17,8 @@ X.Load = function(id, callback) {
       var status = xhr.status;
       if (status == 200) {
         var obj = JSON.parse(xhr.responseText);
-        callback(obj.error, obj.sequence, obj.dbn);
+        var vertices = JSON.parse(obj.vertices);
+        callback(obj.error, obj.sequence, obj.dbn, vertices);
       } else {
         callback(K.API_UNKNOWN_ERROR);
       }
@@ -32,10 +33,10 @@ X.Load = function(id, callback) {
  * @param  {Function} callback
 
  */
-X.Create = function(dbn, callback) {
+X.Create = function(dbn, vertices, callback) {
 
   var xhr = new XMLHttpRequest();
-  xhr.open('get', _.sprintf('/api/create/%s/%s', dbn.sequence, dbn.dbn), true);
+  xhr.open('get', _.sprintf('/api/create/%s/%s/%s', dbn.sequence, dbn.dbn, vertices), true);
 
   xhr.onreadystatechange = function() {
 
@@ -59,10 +60,10 @@ X.Create = function(dbn, callback) {
  * @param  {function} successHandler [description]
  * @param  {function} errorHandler   [description]
  */
-X.Save = function(id, sequence, dbn, callback) {
+X.Save = function(id, sequence, dbn, vertices, callback) {
 
   var xhr = new XMLHttpRequest();
-  xhr.open('get', _.sprintf('/api/save/%s/%s/%s', id, sequence, dbn), true);
+  xhr.open('get', _.sprintf('/api/save/%s/%s/%s/%s', id, sequence, dbn, vertices), true);
 
   xhr.onreadystatechange = function() {
 
