@@ -17,7 +17,7 @@ X.Load = function(id, callback) {
       var status = xhr.status;
       if (status == 200) {
         var obj = JSON.parse(xhr.responseText);
-        var vertices = JSON.parse(obj.vertices);
+        var vertices = obj.vertices ? JSON.parse(obj.vertices) : null;
         callback(obj.error, obj.sequence, obj.dbn, vertices);
       } else {
         callback(K.API_UNKNOWN_ERROR);

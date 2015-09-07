@@ -101,6 +101,16 @@ Events.prototype.publish = function(event) {
 // user grabbed a vertex to move
 Events.VERTEX_PICKED = 'vertex-picked';
 
+// user wants to construct a new edge, the starting vertex is an additional parameter
+Events.NEW_EDGE = 'new-edge';
+
+// user has completed a drag operation and wants to
+// build an edge between the two vertex parameters
+Events.COMPLETE_EDGE = 'build-edge';
+
+// start UI to construct an edge
+Events.CONSTRUCT_EDGE = 'construct-edge';
+
 // highlight a vertex by index
 Events.HIGHLIGHT_VERTEX = 'hilight-vertex';
 

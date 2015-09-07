@@ -19,6 +19,8 @@ ATGC.Display = function(el) {
 
   // listen for certain app events as well
   Events.I().subscribe(Events.HIGHLIGHT_VERTEX, this.highlightVertex.bind(this));
+
+  Events.I().subscribe(Events.CONSTRUCT_EDGE, this.onConstructEdge.bind(this));
 };
 
 /**
@@ -47,7 +49,11 @@ ATGC.Display.prototype.mouseDown = function(e) {
 
   // signal that the user has grabbed a vertex
   if (v) {
-    Events.I().publish(Events.VERTEX_PICKED, v);
+    if (e.shiftKey) {
+      Events.I().publish(Events.NEW_EDGE, v);
+    } else {
+      Events.I().publish(Events.VERTEX_PICKED, v);
+    }
   }
 };
 
@@ -60,7 +66,23 @@ ATGC.Display.prototype.mouseMove = function(e) {
 
   var p = D.mouseToLocal(e, this.el);
   var v = this.findVertex(p);
-  Events.I().publish(Events.MOUSE_MOVE, p, v);
+
+  if (this.sourceVertex) {
+
+    // we are dragging an edge
+    this.edgeLine.updatePosition(this.edgeLine.start, p);
+
+  } else {
+
+    // publish the event to the world
+
+    Events.I().publish(Events.MOUSE_MOVE, p, v);
+  }
+
+  // stop the browsers default action for mouse drags e.g. selection etc
+  e.preventDefault();
+  e.stopPropagation();
+  return true;
 
 };
 
@@ -72,7 +94,23 @@ ATGC.Display.prototype.mouseMove = function(e) {
 ATGC.Display.prototype.mouseUp = function(e) {
 
   var p = D.mouseToLocal(e, this.el);
-  Events.I().publish(Events.MOUSE_UP, p);
+
+  // consume the event if the user is dragging an edge, otherwise publish globally
+  if (this.sourceVertex && this.edgeLine) {
+
+    var v = this.findVertex(p);
+
+    // publish event to indicate possible new edge creation
+    Events.I().publish(Events.COMPLETE_EDGE, this.sourceVertex, v);
+
+    // remove the temporary display element
+    this.el.removeChild(this.edgeLine.el);
+    this.sourceVertex = null;
+    this.edgeLine = null;
+
+  } else {
+    Events.I().publish(Events.MOUSE_UP, p);
+  }
 
 };
 
@@ -94,7 +132,7 @@ ATGC.Display.prototype.findVertex = function(sp) {
     var d = new ATGC.layout.Line(sp.x, sp.y, vx, vy).length;
 
     // if distance is within radius of vertex then its a hit
-    if (d < ATGC.kNR / 2) {
+    if (d < ATGC.kNR) {
       hit = v;
     }
 
@@ -125,6 +163,26 @@ ATGC.Display.prototype.highlightVertex = function(event, index) {
       v.element.el.classList.remove('nucleotide-highlighted');
     }, 400);
   }
+};
+
+/**
+ * start constructing an edge from the given source vertex
+ * @param  {[type]} sourceVertex [description]
+ * @return {[type]}              [description]
+ */
+ATGC.Display.prototype.onConstructEdge = function(event, sourceVertex) {
+
+  this.sourceVertex = sourceVertex;
+  this.edgeLine = new ATGC.Edge({
+    type: ATGC.DBN.NUCLEOTIDE
+  });
+  this.el.appendChild(this.edgeLine.el);
+
+  var x = parseFloat(sourceVertex.element.el.style.left);
+  var y = parseFloat(sourceVertex.element.el.style.top);
+
+  this.edgeLine.updatePosition(new ATGC.layout.Vector(x, y), new ATGC.layout.Vector(x, y));
+
 };
 
 /**
@@ -202,6 +260,28 @@ ATGC.Display.prototype.showSequence = function(dbn, vertices) {
 };
 
 /**
+ * add an edge between two existing vertices. Used when the user has dragged out a new edge
+ * @param  {[type]} v1 [description]
+ * @param  {[type]} v2 [description]
+ * @return {[type]}    [description]
+ */
+ATGC.Display.prototype.addEdge = function(v1, v2) {
+
+  // create and position edge
+  var edge = this.graph.addEdge(v1, v2, {
+    type: ATGC.DBN.NUCLEOTIDE
+  });
+
+  var x1 = parseFloat(v1.element.el.style.left);
+  var y1 = parseFloat(v1.element.el.style.top);
+  var x2 = parseFloat(v2.element.el.style.left);
+  var y2 = parseFloat(v2.element.el.style.top);
+
+  this.updateEdge(edge, edge.element, new ATGC.layout.Vector(x1, y1), new ATGC.layout.Vector(x2, y2));
+
+};
+
+/**
  * restore position of vertices
  * @param  {[type]} vertices [description]
  * @return {[type]}          [description]
@@ -218,10 +298,10 @@ ATGC.Display.prototype.restoreVertices = function(vertices) {
     var y = vertices[v.index].y * b.h;
 
     // apply position to start/end edges connected to this vertex as well
-    _.each(v.inEdges , function(e){
+    _.each(v.inEdges, function(e) {
       e.element.end = new ATGC.layout.Vector(x, y);
     });
-    _.each(v.outEdges , function(e){
+    _.each(v.outEdges, function(e) {
       e.element.start = new ATGC.layout.Vector(x, y);
     });
 

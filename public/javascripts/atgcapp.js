@@ -33,6 +33,12 @@ ATGC.App.prototype.UISetup = function() {
   // new sequence event
   Events.I().subscribe(Events.NEW_SEQUENCE, this.onNewSequence.bind(this));
 
+  // user is creating a new edge
+  Events.I().subscribe(Events.NEW_EDGE, this.onNewEdge.bind(this));
+
+  // user completed construction of new edge
+  Events.I().subscribe(Events.COMPLETE_EDGE, this.onCompleteEdge.bind(this));
+
   // new sequence can be triggered from the toolbar also
   this.displayButton.addEventListener('click', this.onNewSequence.bind(this));
 
@@ -58,9 +64,7 @@ ATGC.App.prototype.UISetup = function() {
  * @return {[type]} [description]
  */
 ATGC.App.prototype.onSave = function() {
-
   this.enterState(ATGC.App.UI_FSM.ShareSave);
-
 };
 
 /**
@@ -71,6 +75,88 @@ ATGC.App.prototype.onNew = function() {
 
   this.enterState(ATGC.App.UI_FSM.CreateNew);
 
+};
+
+/**
+ * user is starting a new edge
+ * @param  {[type]} event  [description]
+ * @param  {[type]} vertex [description]
+ * @return {[type]}        [description]
+ */
+ATGC.App.prototype.onNewEdge = function(event, vertex) {
+
+  // start a new edge if it appears valid
+  if (!this.hasNucleotideBond(vertex)) {
+    this.sourceVertex = vertex;
+    this.enterState(ATGC.App.UI_FSM.CreateEdge);
+  }
+};
+
+/**
+ * true if the vertex already has a nucleotide bond
+ * @param  {[type]} vertex [description]
+ * @return {[type]}        [description]
+ */
+ATGC.App.prototype.hasNucleotideBond = function(vertex) {
+
+  var hasNucleotide = false;
+  _.each(vertex.inEdges, function(e) {
+    if (e.type === ATGC.DBN.NUCLEOTIDE) {
+      hasNucleotide = true;
+    }
+  });
+  _.each(vertex.outEdges, function(e) {
+    if (e.type === ATGC.DBN.NUCLEOTIDE) {
+      hasNucleotide = true;
+    }
+  });
+
+  return hasNucleotide;
+
+};
+
+/**
+ * if legal complete an edge between the two vertices
+ * @param  {[type]} event [description]
+ * @param  {[type]} v1    [description]
+ * @param  {[type]} v2    [description]
+ * @return {[type]}       [description]
+ */
+ATGC.App.prototype.onCompleteEdge = function(event, v1, v2) {
+
+  // remove any previous alerts, this may generate new ones
+  this.hideAlerts();
+
+  // cannot connect to self and both vertices must exist
+  if (!v2 || !v1 || v1.index === v2.index) {
+    this.showError('That nucleotide connection is invalid.');
+    return;
+  }
+
+  // if either vertex already has a nucleotide bond its invalid
+  if (this.hasNucleotideBond(v1) || this.hasNucleotideBond(v2)) {
+    this.showError('Existing nucleotide connection exists on that vertex.');
+    return;
+  }
+
+  // finally validate that the resulting DBN appears valid
+  var temp = this.dbn.clone();
+  var valid = temp.addConnection(v1.index, v2.index);
+
+  if (valid) {
+    // update the DBN and sequence text
+    this.dbnInput.value = temp.dbn;
+    this.dbn.dbn = temp.dbn;
+    this.sequenceInput.value = temp.sequence;
+    // add the edge
+    this.graph.addEdge(v1, v2);
+
+  } else {
+    this.showError('That connection does not produce valid DBN');
+  }
+
+  // back to edit mode regardless of whether connection was valid
+  this.enterState(ATGC.App.UI_FSM.EditGraph);
 };
 
 
@@ -162,7 +248,7 @@ ATGC.App.prototype.getCaretPos = function(input) {
   }
 
   return caret_pos;
-}
+};
 
 /**
  * mouse move handler
@@ -367,6 +453,15 @@ ATGC.App.prototype.enterState = function(state) {
 
       break;
 
+    case ATGC.App.UI_FSM.CreateEdge:
+
+      U.ASSERT(this.sourceVertex, 'Expected a source vertex');
+
+      // the display will handle the actual drag operation
+      Events.I().publish(Events.CONSTRUCT_EDGE, this.sourceVertex);
+
+      break;
+
       // user is dragging a vertex
     case ATGC.App.UI_FSM.DragVertex:
 
@@ -507,6 +602,9 @@ ATGC.App.UI_FSM = {
   ShareSequence: 'ShareSequence',
 
   // create a new sequence
-  CreateNew: 'CreateNew'
+  CreateNew: 'CreateNew',
+
+  // create a new edge this.source should be the vertex to start from
+  CreateEdge: 'CreateEdge'
 
 };

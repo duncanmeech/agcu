@@ -16,6 +16,39 @@ ATGC.DBN = function (sequence, dbn) {
 };
 
 /**
+ * clone this DBN, used for temporary validation etc
+ * @return {ATGC.DBN} new instance of DBN
+ */
+ATGC.DBN.prototype.clone = function () {
+
+  return new ATGC.DBN(this.sequence, this.dbn);
+
+};
+
+/**
+ * insert a connection between index 1 and index 2
+ * NOTE: We are in a bad state if the connection is not valid
+ * @param  {Number} i1 [description]
+ * @param  {Number} i2 [description]
+ * @returns {Boolean} true if connection appears valid
+ */
+ATGC.DBN.prototype.addConnection = function(i1, i2) {
+
+  // lowest index is represented by '(' and highest by ')'
+
+  var low = Math.min(i1, i2);
+  var hi = Math.max(i1, i2);
+
+  // mutate DBN with new connection and validate
+  var c = _.chars(this.dbn);
+  c[low] = '(';
+  c[hi] = ')';
+  this.dbn = c.join('');
+
+  return !this.validate();
+};
+
+/**
  * populates the given directed graph object
  */
 ATGC.DBN.prototype.populateGraph = function (g) {

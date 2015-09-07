@@ -17,6 +17,7 @@
   font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
   letter-spacing: 2px;
   font-weight: bold;
+  text-transform: uppercase;
 }
 
 
@@ -48,7 +49,7 @@
 }
 // highlight state for nucleotide
 .nucleotide-highlighted {
-  transform: scale(1.5, 1.5) translateX(-25%) translateY(-25%);
+  transform: scale(2, 2) translateX(-25%) translateY(-25%);
   z-index: @top-z;
   border: 2px solid white;
 }
@@ -64,6 +65,8 @@
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
   color: white;
+  -webkit-user-select:none;
+  user-select: none;
 }
 
 // base class for edge elements
@@ -93,4 +96,9 @@
 // override some bootstrap for better layout
 .form-group {
   margin-bottom: 3px;
+}
+.mebadge {
+  float:right;
+  margin-right: 1rem;
+  margin-top: 8px;
 }
