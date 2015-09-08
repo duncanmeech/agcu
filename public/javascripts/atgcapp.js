@@ -55,11 +55,58 @@ ATGC.App.prototype.UISetup = function() {
   this.sequenceInput.addEventListener('keyup', this.onInputKeyup.bind(this));
   this.dbnInput.addEventListener('keyup', this.onInputKeyup.bind(this));
 
+  // track window resizing
+  window.addEventListener('resize', this.onWindowResize.bind(this));
+
+  // listen for change on select
+  this.examplesSelect.addEventListener('change', this.onExample.bind(this));
+
   // initialize graph display surface
   this.graph = new ATGC.Display(this.displaySurface);
 
   // set initial UI state
   this.enterState(ATGC.App.UI_FSM.Initialize);
+};
+
+/**
+ * select a canned example to display
+ */
+ATGC.App.prototype.onExample = function () {
+
+  switch (this.examplesSelect.selectedIndex) {
+
+    case 0:
+    this.sequenceInput.value = 'ATGCATGCATGC';
+    this.dbnInput.value = '((((....))))'
+    break;
+
+    case 1:
+    this.sequenceInput.value = 'CAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIACAGCACGACACUAGCAGUCAGUGUCAGACUGCAIA';
+    this.dbnInput.value = '..(((((...(((((...(((((...(((((.....)))))...))))).....(((((...(((((.....)))))...))))).....)))))...)))))..'
+    break;
+
+    case 2:
+    this.sequenceInput.value = 'AAGAAGAGGTAGCGAGTGGACGTGACTGCTCTATCCCGGGCAAAAGGGATAGAACCAGAGGTGGGGAGTCTGGGCAGTCGGCGACCCGCGAAGACTTGAGGTGCCGCAGCGGCATCCGGAGTAGCGCCGGGCTCCCTCCGGGGTGCAGCCGCCGTCGGGGGAAGGGCGCCACAGGCCGGGAAGACCTCCTCCCTTTGTGTCCAGTAGTGGGGTCCACCGGAGGGCGGCCCGTGGGCCGGGCCTCACCGCGGCGCTCCGGGACTGTGGGGTCAGGCTGCGTTGGGTGGACGCCCACCTCGCCAACCTTCGGAGGTCCCTGGGGGTCTTCGTGCGCCCCGGGGCTGCAGAGATCCAGGGGAGGCGCCTGTGAGGCCCGGACCTGCCCCGGGGCGAAGGGTATGTGGCGAGACAGAGCCCTGCACCCCTAATTCCCGGTGGAAAACTCCTGTTGCCGTTTCCCTCCACCGGCCTGGAGTCTCCCAGTCTTGTCCCGGCAGTGCCGCCCTCCCCACTAAGACCTAGGCGCAAAGGCTTGGCTCATGGTTGACAGCTCAGAGAGAGAAAGATCTGAGGGAAGATG';
+    this.dbnInput.value = '......((((..((...((.(((((((((((((((((........)))))))).(((((.........)))))))))))).)).))..))...))))........(((((....(((((.((.(((((....((((((.(.((((....)))).).))))))..))))).)).(((((.((((((((((((((...(((.((.((.(((((((((.((....)).((((....))))))))))))).)))))))...))))....(((((((((.((.((.((((((....)))))).)))).))).....)))))).)))))))))).)).)))))))))))))........((((((((.((((((...(((...((.(((((((...))..))))).)))))...)))).)))))...)))))..(((((..........((..(.(.(..((((.(((..(((((((...((.((...(((((((.....................)).)))))...)).))..))))).)).(((...........)))..))).)))))).).)))))))....'
+    break;
+  }
+
+  this.vertices = null;
+  this.enterState(ATGC.App.UI_FSM.NewSequence);
+};
+
+/**
+ * layout when window resized unless the force directed layout is still happening
+ * in which case the display is already responsive
+ * @return {[type]} [description]
+ */
+ATGC.App.prototype.onWindowResize = function () {
+
+  if (this.state !== ATGC.App.UI_FSM.DisplaySequence) {
+    if (this.dbn && !this.dbn.validate()) {
+      this.enterState(ATGC.App.UI_FSM.DisplaySequence);
+    }
+  }
 };
 
 /**

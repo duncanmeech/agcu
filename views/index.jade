@@ -51,10 +51,17 @@ block content
       button.hidden(type="submit")
       
     div.toolbar
-      button.btn.btn-success.btn-xs(data-element="displayButton") Display Sequence
-      button.btn.btn-primary.btn-xs(data-element="newButton") New Sequence
-      button.btn.btn-primary.btn-xs(data-element="shareButton") Save Sequence
-      button.btn.btn-default.btn-xs(data-element="settingsButton") Settings
+      button.btn.btn-success.btn-small(data-element="displayButton") Display Sequence
+      button.btn.btn-primary.btn-small(data-element="newButton") New Sequence
+      button.btn.btn-primary.btn-small(data-element="shareButton") Save Sequence
+      button.btn.btn-default.btn-small(data-element="settingsButton") Settings
+      span.pull-right.form-inline
+        label Examples
+        select.form-control(data-element="examplesSelect")
+          option Short
+          option Tall 
+          option Grande
+        
       
   
     div(data-element="displaySurface")

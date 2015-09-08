@@ -327,6 +327,14 @@ ATGC.Display.prototype.continueLayout = function() {
   }
 };
 
+/**
+ * perform a layout regardless of the state of the system using a very small time slice
+ */
+ATGC.Display.prototype.resizeLayout = function() {
+
+  this.layout.update(this.getDisplayBounds(), 10);
+};
+
 
 /**
  * get the current display bounds, inset to allow for the maximum size
